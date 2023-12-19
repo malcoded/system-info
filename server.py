@@ -15,25 +15,22 @@ def get_system_info():
     processor = platform.processor()
 
     # Obtenemos la cantidad de memoria RAM
-    ram = platform.ram()
+    # ram = platform.ram()
 
     # Obtenemos el ID del dispositivo
-    product_id = platform.product()
+    # product_id = platform.product()
 
     # Obtenemos el tipo de sistema operativo
     system = platform.system()
 
     # Obtenemos el ID del lápiz y la entrada táctil
-    pen_and_touch_input = platform._get_sys_info()["input"]["pen_and_touch_input"]
+    # pen_and_touch_input = platform._get_sys_info()["input"]["pen_and_touch_input"]
 
     # Imprimimos la información obtenida
     system_info = {
         "device_name": device_name,
         "processor": processor,
-        "ram": ram,
-        "product_id": product_id,
         "system": system,
-        "pen_and_touch_input": pen_and_touch_input,
     }
     return jsonify(system_info)
 
