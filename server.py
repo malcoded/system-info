@@ -27,7 +27,14 @@ def get_system_info():
     pen_and_touch_input = platform._get_sys_info()["input"]["pen_and_touch_input"]
 
     # Imprimimos la información obtenida
-    system_info = {device_name, processor, ram, product_id, system, pen_and_touch_input}
+    system_info = {
+        "device_name": device_name,
+        "processor": processor,
+        "ram": ram,
+        "product_id": product_id,
+        "system": system,
+        "pen_and_touch_input": pen_and_touch_input,
+    }
     return jsonify(system_info)
 
 
