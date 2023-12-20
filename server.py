@@ -6,6 +6,12 @@ app = Flask(__name__)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 
+def get_client_ip():
+    # Intenta obtener la dirección IP desde el encabezado X-Forwarded-For
+    # Si no está presente, utiliza request.remote_addr
+    return request.headers.get("X-Forwarded-For", request.remote_addr)
+
+
 @app.route("/api/v1/system_info", methods=["GET"])
 def get_system_info():
     # Obtenemos el nombre del dispositivo
@@ -25,7 +31,7 @@ def get_system_info():
 
     # Obtenemos el ID del lápiz y la entrada táctil
     # pen_and_touch_input = platform._get_sys_info()["input"]["pen_and_touch_input"]
-    ip_address = request.remote_addr
+    ip_address = ip_address = get_client_ip()
     user_agent = request.user_agent.string
     # Imprimimos la información obtenida
     system_info = {
