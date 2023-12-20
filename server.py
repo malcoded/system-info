@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import platform
 from flask_cors import CORS
 
@@ -25,12 +25,15 @@ def get_system_info():
 
     # Obtenemos el ID del lápiz y la entrada táctil
     # pen_and_touch_input = platform._get_sys_info()["input"]["pen_and_touch_input"]
-
+    ip_address = request.remote_addr
+    user_agent = request.user_agent.string
     # Imprimimos la información obtenida
     system_info = {
         "device_name": device_name,
         "processor": processor,
         "system": system,
+        "ip_address": ip_address,
+        "user_agent": user_agent,
     }
     return jsonify(system_info)
 
