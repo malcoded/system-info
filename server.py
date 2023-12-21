@@ -17,7 +17,7 @@ def get_client_device_name(client_ip):
         return "Not available"
 
 
-def get_mac_address(ip_address):
+def get_mac_address():
     # Crea un paquete ARP para solicitar la dirección MAC de la IP especificada
 
     return "Not available"
@@ -71,7 +71,7 @@ def get_system_info():
         device_name_ip_f = get_client_ip_f()
         user_agent = request.user_agent.string
         location = obtener_ubicacion(latitud, longitud)
-        mac_addresses = get_mac_address(ip_address)
+        mac_addresses = get_mac_address()
         ipxd = request.remote_addr
         device_name_ip = get_client_device_name(ipxd)
         # Imprimimos la información obtenida
