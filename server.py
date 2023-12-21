@@ -96,4 +96,6 @@ def get_system_info():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    from werkzeug.serving import run_simple
+
+    run_simple("0.0.0.0", 5000, app)
