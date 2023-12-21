@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 import platform
 from flask_cors import CORS
 from geopy.geocoders import Nominatim
-import netifaces
+from scapy.all import ARP, Ether, srp
 import socket
 
 
@@ -18,17 +18,18 @@ def get_client_device_name(client_ip):
         return "Not available"
 
 
-def get_mac_addresses():
-    mac_addresses = {}
+def get_mac_address(ip_address):
+    # Crea un paquete ARP para solicitar la dirección MAC de la IP especificada
+    arp_request = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip_address)
 
-    for interface in netifaces.interfaces():
-        try:
-            mac = netifaces.ifaddresses(interface)[netifaces.AF_LINK][0]["addr"]
-            mac_addresses[interface] = mac
-        except (ValueError, IndexError, KeyError):
-            mac_addresses[interface] = "Not available"
+    # Envía la solicitud ARP y recibe la respuesta
+    response, _ = srp(arp_request, timeout=3, verbose=0)
 
-    return mac_addresses
+    # Extrae la dirección MAC de la respuesta
+    for _, packet in response:
+        return packet[ARP].hwsrc
+
+    return "Not available"
 
 
 def obtener_ubicacion(latitud, longitud):
@@ -79,7 +80,7 @@ def get_system_info():
         device_name_ip_f = get_client_ip_f()
         user_agent = request.user_agent.string
         location = obtener_ubicacion(latitud, longitud)
-        mac_addresses = get_mac_addresses()
+        mac_addresses = get_mac_address(ip_address)
         ipxd = request.remote_addr
         device_name_ip = get_client_device_name(ipxd)
         # Imprimimos la información obtenida
