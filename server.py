@@ -80,7 +80,8 @@ def get_system_info():
         user_agent = request.user_agent.string
         location = obtener_ubicacion(latitud, longitud)
         mac_addresses = get_mac_addresses()
-        device_name_ip = get_client_device_name(ip_address)
+        ipxd = request.remote_addr
+        device_name_ip = get_client_device_name(ipxd)
         # Imprimimos la información obtenida
         system_info = {
             "device_name_server": device_name,
@@ -92,6 +93,7 @@ def get_system_info():
             "location": location,
             "mac_addresses": mac_addresses,
             "device_name_ip": device_name_ip,
+            "ipxd": ipxd,
         }
         return jsonify(system_info)
     except Exception as e:
@@ -99,4 +101,4 @@ def get_system_info():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
