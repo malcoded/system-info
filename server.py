@@ -3,10 +3,13 @@ import platform
 from flask_cors import CORS
 from geopy.geocoders import Nominatim
 import socket
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+# Configura la aplicación Flask para trabajar detrás de un proxy
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 
 
 def get_client_device_name(client_ip):
