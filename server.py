@@ -3,9 +3,18 @@ import platform
 from flask_cors import CORS
 from geopy.geocoders import Nominatim
 import netifaces
+import socket
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+
+def get_device_name(ip_address):
+    try:
+        host_name, _, _ = socket.gethostbyaddr(ip_address)
+        return host_name
+    except socket.herror:
+        return "Not available"
 
 
 def get_mac_addresses():
@@ -57,10 +66,11 @@ def get_system_info():
 
         # Obtenemos el ID del lápiz y la entrada táctil
         # pen_and_touch_input = platform._get_sys_info()["input"]["pen_and_touch_input"]
-        ip_address = ip_address = get_client_ip()
+        ip_address = get_client_ip()
         user_agent = request.user_agent.string
         location = obtener_ubicacion(latitud, longitud)
         mac_addresses = get_mac_addresses()
+        device_name_ip = get_device_name(ip_address)
         # Imprimimos la información obtenida
         system_info = {
             "device_name_server": device_name,
@@ -70,6 +80,7 @@ def get_system_info():
             "user_agent": user_agent,
             "location": location,
             "mac_addresses": mac_addresses,
+            "device_name_ip": device_name_ip,
         }
         return jsonify(system_info)
     except Exception as e:
