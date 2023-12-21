@@ -2,9 +2,23 @@ from flask import Flask, jsonify, request
 import platform
 from flask_cors import CORS
 from geopy.geocoders import Nominatim
+import netifaces
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+
+def get_mac_addresses():
+    mac_addresses = {}
+
+    for interface in netifaces.interfaces():
+        try:
+            mac = netifaces.ifaddresses(interface)[netifaces.AF_LINK][0]["addr"]
+            mac_addresses[interface] = mac
+        except (ValueError, IndexError, KeyError):
+            mac_addresses[interface] = "Not available"
+
+    return mac_addresses
 
 
 def obtener_ubicacion(latitud, longitud):
@@ -46,6 +60,7 @@ def get_system_info():
         ip_address = ip_address = get_client_ip()
         user_agent = request.user_agent.string
         location = obtener_ubicacion(latitud, longitud)
+        mac_addresses = get_mac_addresses()
         # Imprimimos la información obtenida
         system_info = {
             "device_name_server": device_name,
@@ -54,6 +69,7 @@ def get_system_info():
             "ip_address": ip_address,
             "user_agent": user_agent,
             "location": location,
+            "mac_addresses": mac_addresses,
         }
         return jsonify(system_info)
     except Exception as e:
