@@ -1,25 +1,17 @@
 from flask import Flask, jsonify, request
 import platform
 from flask_cors import CORS
-import geocoder
+from geopy.geocoders import Nominatim
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 
-def get_current_location():
-    try:
-        # Utiliza el servicio gratuito de ipinfo.io para obtener la ubicación basada en la dirección IP
-        location_info = geocoder.ip("me").json
+def obtener_ubicacion(latitud, longitud):
+    geolocalizador = Nominatim(user_agent="mi_aplicacion")
+    ubicacion = geolocalizador.reverse((latitud, longitud))
 
-        city = location_info.get("city", "N/A")
-        country = location_info.get("country", "N/A")
-        region = location_info.get("region", "N/A")
-        latlng = location_info.get("latlng", "N/A")
-
-        return f"Ciudad: {city}, País: {country}, Región: {region}, Latitud/Longitud: {latlng}"
-    except Exception as e:
-        return f"Error al obtener la ubicación: {e}"
+    return ubicacion.address if ubicacion else "Ubicación no encontrada"
 
 
 def get_client_ip():
@@ -28,38 +20,44 @@ def get_client_ip():
     return request.headers.get("X-Forwarded-For", request.remote_addr)
 
 
-@app.route("/api/v1/system_info", methods=["GET"])
+@app.route("/api/v1/system_info", methods=["POST"])
 def get_system_info():
-    # Obtenemos el nombre del dispositivo
-    device_name = platform.node()
+    try:
+        data = request.json
+        latitud = data["latitud"]
+        longitud = data["longitud"]
+        # Obtenemos el nombre del dispositivo
+        device_name = platform.node()
 
-    # Obtenemos el tipo de procesador
-    processor = platform.processor()
+        # Obtenemos el tipo de procesador
+        processor = platform.processor()
 
-    # Obtenemos la cantidad de memoria RAM
-    # ram = platform.ram()
+        # Obtenemos la cantidad de memoria RAM
+        # ram = platform.ram()
 
-    # Obtenemos el ID del dispositivo
-    # product_id = platform.product()
+        # Obtenemos el ID del dispositivo
+        # product_id = platform.product()
 
-    # Obtenemos el tipo de sistema operativo
-    system = platform.system()
+        # Obtenemos el tipo de sistema operativo
+        system = platform.system()
 
-    # Obtenemos el ID del lápiz y la entrada táctil
-    # pen_and_touch_input = platform._get_sys_info()["input"]["pen_and_touch_input"]
-    ip_address = ip_address = get_client_ip()
-    user_agent = request.user_agent.string
-    location = get_current_location()
-    # Imprimimos la información obtenida
-    system_info = {
-        "device_name": device_name,
-        "processor": processor,
-        "system": system,
-        "ip_address": ip_address,
-        "user_agent": user_agent,
-        "location": location,
-    }
-    return jsonify(system_info)
+        # Obtenemos el ID del lápiz y la entrada táctil
+        # pen_and_touch_input = platform._get_sys_info()["input"]["pen_and_touch_input"]
+        ip_address = ip_address = get_client_ip()
+        user_agent = request.user_agent.string
+        location = obtener_ubicacion(latitud, longitud)
+        # Imprimimos la información obtenida
+        system_info = {
+            "device_name_server": device_name,
+            "processor_server": processor,
+            "system_server": system,
+            "ip_address": ip_address,
+            "user_agent": user_agent,
+            "location": location,
+        }
+        return jsonify(system_info)
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 
 if __name__ == "__main__":
